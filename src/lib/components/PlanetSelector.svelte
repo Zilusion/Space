@@ -4,6 +4,7 @@
 
     export let value; // Changed from selectedId to 'value' for clarity, but you can keep selectedId
     export let planetNumber;
+    export let options = [];
 
     const dispatch = createEventDispatcher(); // 2. Create dispatcher instance
 
@@ -14,7 +15,7 @@
 </script>
 
 <select {value} on:change={handleChange} aria-label={`Выбор планеты ${planetNumber}`}>
-    {#each planets as planet}
+    {#each options as planet}
         <option value={planet.id}>{planet.name}</option>
     {/each}
 </select>

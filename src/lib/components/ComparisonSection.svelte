@@ -22,6 +22,8 @@
             value1={planet1[row.key]}
             value2={planet2[row.key]}
             isTemperature={row.key === 'temperature'}
+            p1={planet1}
+            p2={planet2}
         />
     {/each}
 </div>
