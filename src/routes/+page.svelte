@@ -8,31 +8,44 @@
 	import PlanetSelector from '$lib/components/PlanetSelector.svelte';
 	import ComparisonSection from '$lib/components/ComparisonSection.svelte';
 	import { planets } from '$lib/data/planets';
+	import '../app.scss';
 
-	// Function to update the first store
-	function handlePlanet1Change(event) {
-		selectedPlanet1Id.set(event.detail); // Use the store's .set method
+	function handlePlanet1Change(newId) {
+		selectedPlanet1Id.set(newId);
+	}
+	function handlePlanet2Change(newId) {
+		selectedPlanet2Id.set(newId);
 	}
 
-	// Function to update the second store
-	function handlePlanet2Change(event) {
-		selectedPlanet2Id.set(event.detail); // Use the store's .set method
-	}
-
-	$: availablePlanetsForSelector1 = planets.filter((planet) => planet.id !== $selectedPlanet2Id);
-	$: availablePlanetsForSelector2 = planets.filter((planet) => planet.id !== $selectedPlanet1Id);
+	let availablePlanetsForSelector1 = $derived(
+		planets.filter((planet) => planet.id !== $selectedPlanet2Id)
+	);
+	let availablePlanetsForSelector2 = $derived(
+		planets.filter((planet) => planet.id !== $selectedPlanet1Id)
+	);
 </script>
 
 <div class="container">
 	<header>
-		<h1>КОСМОС</h1>
+		<!-- <h1>КОСМОС</h1> -->
+		<img src="/images/logo.png" alt="">
 	</header>
 
 	<main>
 		<div class="selectors">
-			<PlanetSelector options={availablePlanetsForSelector1} value={$selectedPlanet1Id} on:change={handlePlanet1Change} planetNumber={1} />
+			<PlanetSelector
+				options={availablePlanetsForSelector1}
+				value={$selectedPlanet1Id}
+				onChange={handlePlanet1Change}
+				planetNumber={1}
+			/>
 			<span class="vs">VS</span>
-			<PlanetSelector options={availablePlanetsForSelector2} value={$selectedPlanet2Id} on:change={handlePlanet2Change} planetNumber={2} />
+			<PlanetSelector
+				options={availablePlanetsForSelector2}
+				value={$selectedPlanet2Id}
+				onChange={handlePlanet2Change}
+				planetNumber={2}
+			/>
 		</div>
 
 		{#if $selectedPlanet1 && $selectedPlanet2}
@@ -46,7 +59,6 @@
 </div>
 
 <style>
-	/* Стили остаются без изменений */
 	.container {
 		display: grid;
 		grid-template-rows: auto auto 1fr;
@@ -63,7 +75,6 @@
 
 	header h1 {
 		font-size: clamp(2.5rem, 10vw, 6rem);
-		/* ... */
 	}
 
 	.selectors {
@@ -82,40 +93,15 @@
 
 	.background-planet {
 		position: absolute;
-		left: -30%;
-		top: 10%;
+		left: -38%;
+		top: 35vh;
 		width: clamp(400px, 80vw, 1200px);
 		height: clamp(400px, 80vw, 1200px);
-		/* background: url('/path/to/default-planet.png') no-repeat center center; */ /* Не забудь раскомментировать и указать путь */
-		background-color: #553311; /* Временный цвет для фона */
+		background-image: url('/images/space/stars/sun.png');
 		background-size: contain;
-		border-radius: 50%; /* Сделать круглым */
-		opacity: 0.3;
+		border-radius: 50%;
 		z-index: -1;
 		transition: background-image 0.5s ease-in-out;
 	}
 
-	:global(:root) {
-		--text-color: #eee;
-		--accent-color: #4ade80;
-		--bg-color: #000;
-		font-family: 'Arial', sans-serif;
-	}
-	:global(body) {
-		background-color: var(--bg-color);
-		color: var(--text-color);
-		margin: 0;
-		font-family:
-			system-ui,
-			-apple-system,
-			BlinkMacSystemFont,
-			'Segoe UI',
-			Roboto,
-			Oxygen,
-			Ubuntu,
-			Cantarell,
-			'Open Sans',
-			'Helvetica Neue',
-			sans-serif; /* Более системный шрифт */
-	}
 </style>
