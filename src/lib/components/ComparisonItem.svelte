@@ -1,6 +1,7 @@
 <script>
-	import AnimatedNumber from './AnimatedNumber.svelte';
 	import { base } from '$app/paths';
+	import AnimatedNumber from './AnimatedNumber.svelte';
+	import GravityJump from './GravityJump.svelte';
 
 	let { key = '', planet = null, value = null, position = 'left' } = $props();
 
@@ -39,7 +40,9 @@
 		<div class="comparison-item__visual comparison-item__visual--diameter">
 			{#if planet}
 				<img
-					src="{planet.image ? `${base}${planet.image}` : `${base}/images/universe/planets/${planet.id}.webp`}"
+					src={planet.image
+						? `${base}${planet.image}`
+						: `${base}/images/universe/planets/${planet.id}.webp`}
 					alt={planet.name}
 					class="planet-image"
 					style="width: {diameterPx}px; height: {diameterPx}px;"
@@ -80,10 +83,17 @@
 		</div>
 	{:else if key === 'orbit'}
 		<div class="comparison-item__visual comparison-item__visual--orbit"></div>
+	{:else if key === 'gravity'}
+		<div class="comparison-item__visual comparison-item__visual--gravity">
+			<GravityJump gravityValue={value} />
+		</div>
 	{/if}
 
 	<div class="comparison-item__value">
-		<AnimatedNumber {value} precision={key === 'diameter' ? 0 : key === 'mass' ? 3 : 1} />
+		<AnimatedNumber
+			{value}
+			precision={key === 'diameter' ? 0 : key === 'mass' ? 3 : key === 'gravity' ? 2 : 1}
+		/>
 	</div>
 </div>
 
@@ -151,6 +161,15 @@
 	.comparison-item__visual--orbit {
 		min-height: 40px;
 		width: 100%;
+	}
+
+	.comparison-item__visual--gravity {
+		display: flex;
+		justify-content: center;
+		align-items: flex-end; 
+		height: 100%;
+		min-height: 150px;
+		padding-bottom: 10px;
 	}
 
 	.earth-icon {

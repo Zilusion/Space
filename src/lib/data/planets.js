@@ -18,6 +18,7 @@ export const planets = [
 		orbit: 57.9,
 		year: 88,
 		temperature: 167,
+		gravity: 0.38,
 		image: '/images/universe/planets/mercury.webp'
 	},
 	{
@@ -29,6 +30,7 @@ export const planets = [
 		orbit: 108.2,
 		year: 224.7,
 		temperature: 464,
+		gravity: 0.9,
 		image: '/images/universe/planets/venus.webp'
 	},
 	{
@@ -40,6 +42,7 @@ export const planets = [
 		orbit: 149.6,
 		year: 365.25,
 		temperature: 15,
+		gravity: 1.0,
 		image: '/images/universe/planets/earth.webp'
 	},
 	{
@@ -51,6 +54,7 @@ export const planets = [
 		orbit: 227.9,
 		year: 687,
 		temperature: -63,
+		gravity: 0.38,
 		image: '/images/universe/planets/mars.webp'
 	},
 	{
@@ -62,6 +66,7 @@ export const planets = [
 		orbit: 778.5,
 		year: 4333,
 		temperature: -110,
+		gravity: 2.53,
 		image: '/images/universe/planets/jupiter.webp'
 	},
 	{
@@ -73,6 +78,7 @@ export const planets = [
 		orbit: 1432.0,
 		year: 10759,
 		temperature: -140,
+		gravity: 1.06,
 		image: '/images/universe/planets/saturn.webp'
 	},
 	{
@@ -84,6 +90,7 @@ export const planets = [
 		orbit: 2871.0,
 		year: 30687,
 		temperature: -195,
+		gravity: 0.9,
 		image: '/images/universe/planets/uranus.webp'
 	},
 	{
@@ -95,6 +102,7 @@ export const planets = [
 		orbit: 4495.1,
 		year: 60190,
 		temperature: -201,
+		gravity: 1.14,
 		image: '/images/universe/planets/neptune.webp'
 	}
 ];
