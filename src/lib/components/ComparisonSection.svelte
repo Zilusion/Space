@@ -26,32 +26,41 @@
 			unit: 'млн км',
 			key: 'orbit',
 			description: 'среднее расстояние от центра планеты до солнца'
+		},
+		{
+			label: 'СПУТНИКИ',
+			unit: '',
+			key: 'satellites',
+			description: 'количество естественных спутников на орбите'
+		},
+		{
+			label: 'ГОД',
+			unit: 'суток',
+			key: 'year',
+			description: 'время полного оборота вокруг солнца в земных сутках'
 		}
-		// { label: 'СПУТНИКИ', unit: '', key: 'satellites', description: 'количество естественных спутников на орбите' },
-		// { label: 'ГОД', unit: 'суток', key: 'year', description: 'время полного оборота вокруг солнца в земных сутках' },
 	];
 </script>
 
 <div class="comparison-grid">
 	{#each comparisonData as row (row.key)}
 		<ComparisonRow
-            label={row.label}
-            key={row.key}
-            unit={row.unit}
-            description={row.description}
-            value1={planet1?.[row.key]}
-            value2={planet2?.[row.key]}
-            {planet1}
-            {planet2}
-        />
+			label={row.label}
+			key={row.key}
+			unit={row.unit}
+			description={row.description}
+			value1={planet1?.[row.key]}
+			value2={planet2?.[row.key]}
+			{planet1}
+			{planet2}
+		/>
 	{/each}
 </div>
 
 <style lang="scss">
 	.comparison-grid {
-        display: grid;
-        row-gap: 150px;
-        max-width: 1100px;
-        margin: 0 auto;
-    }
+		display: grid;
+		row-gap: 150px;
+		margin: 0 auto;
+	}
 </style>

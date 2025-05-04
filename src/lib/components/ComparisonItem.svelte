@@ -1,5 +1,6 @@
 <script>
 	import AnimatedNumber from './AnimatedNumber.svelte';
+	import { base } from '$app/paths';
 
 	let { key = '', planet = null, value = null, position = 'left' } = $props();
 
@@ -38,7 +39,7 @@
 		<div class="comparison-item__visual comparison-item__visual--diameter">
 			{#if planet}
 				<img
-					src={planet.image || `/images/planets/${planet.id}.png`}
+					src="{planet.image ? `${base}${planet.image}` : `${base}/images/universe/planets/${planet.id}.webp`}"
 					alt={planet.name}
 					class="planet-image"
 					style="width: {diameterPx}px; height: {diameterPx}px;"
@@ -57,7 +58,7 @@
 			{#if earthCount > 0}
 				{#each Array(earthCount) as _, i (i)}
 					<img
-						src="/images/space/planets/earth.png"
+						src="{base}/images/universe/planets/earth.webp"
 						alt=""
 						aria-hidden="true"
 						class="earth-icon"
@@ -71,7 +72,7 @@
 		<div class="comparison-item__visual comparison-item__visual--temperature">
 			{#each temperatureImageNames as imageName (imageName)}
 				<img
-					src={`/images/emoji/${imageName}.png`}
+					src="{base}/images/emoji/{imageName}.webp"
 					alt={imageName}
 					class="temperature-emoji-image"
 				/>
@@ -95,7 +96,7 @@
 
 	.comparison-item--temperature {
 		display: flex;
-		gap: 40px;
+		gap: max(20px, min(40px, 5vw));
 		align-items: center;
 	}
 
@@ -140,6 +141,7 @@
 		margin: 0 auto;
 		overflow: hidden;
 	}
+
 	.comparison-item__visual--temperature {
 		display: flex;
 		align-items: flex-start;
@@ -163,8 +165,8 @@
 
 	.temperature-emoji-image {
 		align-self: flex-start;
-		height: 64px;
-		width: 64px;
+		height: var(--font-size-numbers);
+		width: var(--font-size-numbers);
 		filter: drop-shadow(0 0px 25px rgb(from #ffffff r g b / 20%));
 	}
 

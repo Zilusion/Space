@@ -1,12 +1,28 @@
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+const dev = process.argv.includes('dev');
+const base = dev ? '' : process.env.BASE_PATH || '/space';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+	preprocess: vitePreprocess(),
 	kit: {
-		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-		adapter: adapter()
+		// Используем adapter-static
+		adapter: adapter({
+			// Опции по умолчанию:
+			pages: 'build', // Куда складывать результат
+			assets: 'build', // Куда складывать статику (внутри pages)
+			fallback: '404.html', // ВАЖНО для SPA на GitHub Pages!
+			// GitHub Pages использует 404.html для обработки роутинга SPA.
+			precompress: false // Можно включить true для gzip/brotli, если хочешь
+		}),
+
+		// Указываем базовый путь для ссылок на ресурсы
+		paths: {
+			base: base
+			// assets: '' // Можно оставить пустым, если статика лежит в base
+		}
 	}
 };
 

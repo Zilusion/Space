@@ -1,6 +1,7 @@
 <script>
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
+	import { base } from '$app/paths';
 	import ComparisonItem from './ComparisonItem.svelte';
 
 	let {
@@ -25,27 +26,30 @@
 		const _trigger = comparisonSymbol;
 	});
 
-	// --- Orbit Calculation Logic ---
-	const MAX_ORBIT_DISTANCE = 4550; // Max distance for scaling (e.g., Neptune)
-	const SUN_RADIUS_PERCENT = 10; // Percentage width the sun radius takes approx.
-	const ORBIT_LINE_START_PERCENT = SUN_RADIUS_PERCENT * 1.5; // Start line slightly away from sun center
-	const ORBIT_LINE_AVAILABLE_WIDTH_PERCENT = 95 - ORBIT_LINE_START_PERCENT; // Available width for orbits %
+	const MAX_ORBIT_DISTANCE = 4550;
+	const SUN_RADIUS_PERCENT = 20;
+	const ORBIT_LINE_START_PERCENT = SUN_RADIUS_PERCENT * 1.5;
+	const ORBIT_LINE_AVAILABLE_WIDTH_PERCENT = 95 - ORBIT_LINE_START_PERCENT;
 
 	function calculateOrbitPositionPercent(orbitValue) {
 		if (orbitValue === null || orbitValue === undefined || MAX_ORBIT_DISTANCE <= 0)
-			return `${ORBIT_LINE_START_PERCENT}%`; // Default near sun
-		// Scale orbit distance to the available line width percentage
+			return `${ORBIT_LINE_START_PERCENT}%`;
 		const scaledPercent = (orbitValue / MAX_ORBIT_DISTANCE) * ORBIT_LINE_AVAILABLE_WIDTH_PERCENT;
-		// Add the starting offset and ensure it doesn't exceed 100% (or slightly less)
 		const finalPercent = ORBIT_LINE_START_PERCENT + scaledPercent;
-		return `${Math.max(ORBIT_LINE_START_PERCENT, Math.min(finalPercent, 98))}%`; // Clamp value
+		return `${Math.max(ORBIT_LINE_START_PERCENT, Math.min(finalPercent, 98))}%`;
 	}
 
 	function calculatePlanetImageSize(diameter) {
-		if (!diameter) return '16px'; // Default small size
-		// Scale based on diameter, but keep it small
-		const size = 12 + Math.log10(diameter) * 4; // Log scale for visual difference
-		return `${Math.max(12, Math.min(size, 40))}px`; // Clamp size between 12px and 40px
+		const MIN_SIZE_PX = 5;
+		const MAX_SIZE_PX = 60;
+
+		if (diameter === null || diameter === undefined || diameter <= 0) {
+			return `${MIN_SIZE_PX}px`;
+		}
+		const calculatedSize = diameter / 1000;
+		const finalSize = Math.max(MIN_SIZE_PX, Math.min(calculatedSize, MAX_SIZE_PX));
+
+		return `${finalSize}px`;
 	}
 
 	let orbitPosPercent1 = $derived(calculateOrbitPositionPercent(planet1?.orbit));
@@ -53,7 +57,6 @@
 	let planetSize1 = $derived(calculatePlanetImageSize(planet1?.diameter));
 	let planetSize2 = $derived(calculatePlanetImageSize(planet2?.diameter));
 
-	// Inline styles for positioning planet images on the shared line
 	let orbitPlanetStyle1 = $derived(
 		`left: ${orbitPosPercent1}; width: ${planetSize1}; height: ${planetSize1};`
 	);
@@ -62,7 +65,7 @@
 	);
 </script>
 
-<div class="comparison-row">
+<div class="comparison-row comparison-row--{key}">
 	<div class="comparison-row__header">
 		<h3 class="comparison-row__title">
 			{label}{#if key !== 'mass' && unit}, {unit}{/if}
@@ -72,11 +75,11 @@
 
 	{#if key === 'orbit'}
 		<div class="comparison-row__orbit-visualization">
-			<img src="/images/space/stars/sun.png" alt="Sun" class="orbit-sun" />
+			<img src="{base}/images/universe/stars/sun.png" alt="Sun" class="orbit-sun" />
 			<div class="orbit-line"></div>
 			{#if planet1}
 				<img
-					src={planet1.image || `/images/space/planets/${planet1.id}.png`}
+					src="{planet1.image ? `${base}${planet1.image}` : `${base}/images/universe/planets/${planet1.id}.webp`}"
 					alt={planet1.name}
 					class="orbit-planet-image"
 					style={orbitPlanetStyle1}
@@ -85,7 +88,7 @@
 			{/if}
 			{#if planet2}
 				<img
-					src={planet2.image || `/images/space/planets/${planet2.id}.png`}
+					src="{planet2.image ? `${base}${planet2.image}` : `${base}/images/universe/planets/${planet2.id}.webp`}"
 					alt={planet2.name}
 					class="orbit-planet-image"
 					style={orbitPlanetStyle2}
@@ -131,7 +134,7 @@
 					/></svg
 				>
 			{:else}
-				<span>=</span>
+				<span></span>
 			{/if}
 		</div>
 	</div>
@@ -147,11 +150,17 @@
 		grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
 		grid-template-areas:
 			'header header header'
-			'item-left symbol item-right'
-			'orbit orbit orbit';
+			'item-left symbol item-right';
 		position: relative;
 		padding: 15px 0;
 		gap: 30px;
+	}
+
+	.comparison-row--orbit {
+		grid-template-areas:
+			'header header header'
+			'item-left symbol item-right'
+			'orbit orbit orbit';
 	}
 
 	.comparison-row__header {
@@ -209,26 +218,27 @@
 		grid-area: orbit;
 		position: relative;
 		height: 40px;
-		width: 100%;
-		margin-top: 20px;
-		margin-bottom: -50px;
 		z-index: 1;
-		left: -12.5vw;
-		top: 0;
-		width: clamp(0px, 75vw, 1920px);
+		bottom: 0;
+		left: 0;
+		width: clamp(0px, 100%, 1920px);
 	}
 
 	.orbit-sun {
 		position: absolute;
 		top: 50%;
-		translate: -82% -50%;
-		width: 4096px;
+		translate: -85% -50%;
+		width: clamp(200px, 300vw, 4096px);
 		aspect-ratio: 1;
 		max-width: none;
 		z-index: 1;
 		pointer-events: none;
 		user-select: none;
-		animation: rotate 120s infinite linear;
+		will-change: rotate;
+		
+		&:hover {
+			animation: rotate 240s infinite linear;
+		}
 	}
 
 	@keyframes rotate {
@@ -243,9 +253,9 @@
 	.orbit-line {
 		position: absolute;
 		height: 1px;
-		left: 0;
+		left: -100vw;
 		top: 0;
-		width: 100%;
+		right: 0;
 		background: linear-gradient(to right, var(--gradient-orbit-colors));
 		z-index: 0;
 	}

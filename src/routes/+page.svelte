@@ -5,6 +5,7 @@
 		selectedPlanet1,
 		selectedPlanet2
 	} from '$lib/stores/selectedPlanets';
+	import { base } from '$app/paths';
 	import PlanetSelector from '$lib/components/PlanetSelector.svelte';
 	import ComparisonSection from '$lib/components/ComparisonSection.svelte';
 	import { planets } from '$lib/data/planets';
@@ -13,6 +14,7 @@
 	function handlePlanet1Change(newId) {
 		selectedPlanet1Id.set(newId);
 	}
+
 	function handlePlanet2Change(newId) {
 		selectedPlanet2Id.set(newId);
 	}
@@ -27,7 +29,7 @@
 
 <div class="container">
 	<header class="page-header">
-		<img src="/images/logo.png" alt="КОСМОС Лого" class="logo-image" />
+		<img src="{base}/images/logo.webp" alt="КОСМОС Лого" class="logo-image" />
 	</header>
 
 	<main>
@@ -60,6 +62,7 @@
 		min-height: 100vh;
 		max-width: 840px;
 		padding: clamp(1rem, 3vw, 2rem);
+		padding-top: 0;
 		display: grid;
 		grid-template-rows: auto auto 1fr;
 		gap: clamp(1.5rem, 5vh, 3rem);
@@ -69,11 +72,10 @@
 	.page-header {
 		text-align: center;
 		padding-block: 40px;
-		background: url('/images/header-bg.png') center center/contain no-repeat;
+		background: url('/images/header-bg.webp') center center/contain no-repeat;
 	}
 
 	.logo-image {
-		
 		width: 100%;
 	}
 

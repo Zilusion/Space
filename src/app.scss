@@ -140,7 +140,7 @@ input[type='file'] {
 	--font-ls-wide: 0.05em;
 
 	--color-prime: #ffffff;
-	--color-background-base: #010102;
+	--color-background-base: #020202;
 	--color-text-base: #e0e0e0;
 	--color-text-muted: #888888;
 	--color-text-additional: #81b0b7;
@@ -162,21 +162,44 @@ input[type='file'] {
 }
 
 html {
+	position: relative;
 	font-family: var(--font-family-base);
 	line-height: var(--font-lh-base);
 	font-size: 16px;
 	color: var(--color-text-base);
+
+	&::before {
+		content: '';
+		inset: 0;
+		position: absolute;
+		background: url('/images/overlay.webp');
+		opacity: 0.01;
+	}
+}
+
+@media screen and (max-width: 800px) {
+	html {
+		font-size: 12px;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	html {
+		font-size: 10px;
+	}
 }
 
 html,
 body {
-	overflow-x: hidden;
-	height: 100%;
+	
 	min-height: 100vh;
+	height: auto;
+	
 }
 
 body {
-	background-color: var(--color-background-base);
-	// display: grid;
-	// place-content: center;
+	overflow-x: hidden;
+	width: 100vw;
+	position: relative;
+	background: url('/images/bg.webp') var(--color-background-base);
 }
