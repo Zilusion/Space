@@ -1,14 +1,20 @@
 <script>
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import AnimatedNumber from './AnimatedNumber.svelte';
+	import ComparisonItem from './ComparisonItem.svelte';
 
-	let { label, unit, value1, value2, isTemperature = false, planet1, planet2 } = $props();
+	let {
+		label = '',
+		key = '',
+		unit = '',
+		description = '',
+		planet1 = null,
+		planet2 = null,
+		value1 = null,
+		value2 = null
+	} = $props();
 
 	let comparisonSymbol = $derived(value1 === value2 ? '=' : value1 > value2 ? '>' : '<');
-	let comparisonSymbolTemp = $derived(value1 === value2 ? '=' : value1 < value2 ? '>' : '<');
-
-	let finalSymbol = $derived(isTemperature ? comparisonSymbolTemp : comparisonSymbol);
 
 	const symbolOpacity = tweened(0, { duration: 100, easing: cubicOut });
 	const symbolScale = tweened(0.5, { duration: 300, easing: cubicOut });
@@ -16,186 +22,240 @@
 	$effect(() => {
 		symbolOpacity.set(0).then(() => symbolOpacity.set(1));
 		symbolScale.set(0.5).then(() => symbolScale.set(1));
-		const _trigger = finalSymbol;
+		const _trigger = comparisonSymbol;
 	});
 
-	let planet1DiameterPx = $derived(100 + (planet1?.diameter || 0) / 1000);
-	let planet2DiameterPx = $derived(100 + (planet2?.diameter || 0) / 1000);
+	// --- Orbit Calculation Logic ---
+	const MAX_ORBIT_DISTANCE = 4550; // Max distance for scaling (e.g., Neptune)
+	const SUN_RADIUS_PERCENT = 10; // Percentage width the sun radius takes approx.
+	const ORBIT_LINE_START_PERCENT = SUN_RADIUS_PERCENT * 1.5; // Start line slightly away from sun center
+	const ORBIT_LINE_AVAILABLE_WIDTH_PERCENT = 95 - ORBIT_LINE_START_PERCENT; // Available width for orbits %
 
-	let earthCount1 = $derived(Math.floor(planet1?.mass || 0));
-	let earthCount2 = $derived(Math.floor(planet2?.mass || 0));
-
-	function getTemperatureEmoji(temp) {
-		if (temp === null || temp === undefined) return '';
-		if (temp >= 200) return '☠️🔥';
-		if (temp >= 40) return '🥵';
-		if (temp >= -60) return '😎';
-		if (temp > -65) return '🥶';
-		return '💀❄️';
+	function calculateOrbitPositionPercent(orbitValue) {
+		if (orbitValue === null || orbitValue === undefined || MAX_ORBIT_DISTANCE <= 0)
+			return `${ORBIT_LINE_START_PERCENT}%`; // Default near sun
+		// Scale orbit distance to the available line width percentage
+		const scaledPercent = (orbitValue / MAX_ORBIT_DISTANCE) * ORBIT_LINE_AVAILABLE_WIDTH_PERCENT;
+		// Add the starting offset and ensure it doesn't exceed 100% (or slightly less)
+		const finalPercent = ORBIT_LINE_START_PERCENT + scaledPercent;
+		return `${Math.max(ORBIT_LINE_START_PERCENT, Math.min(finalPercent, 98))}%`; // Clamp value
 	}
 
-	let emoji1 = $derived(getTemperatureEmoji(planet1?.temperature));
-	let emoji2 = $derived(getTemperatureEmoji(planet2?.temperature));
+	function calculatePlanetImageSize(diameter) {
+		if (!diameter) return '16px'; // Default small size
+		// Scale based on diameter, but keep it small
+		const size = 12 + Math.log10(diameter) * 4; // Log scale for visual difference
+		return `${Math.max(12, Math.min(size, 40))}px`; // Clamp size between 12px and 40px
+	}
+
+	let orbitPosPercent1 = $derived(calculateOrbitPositionPercent(planet1?.orbit));
+	let orbitPosPercent2 = $derived(calculateOrbitPositionPercent(planet2?.orbit));
+	let planetSize1 = $derived(calculatePlanetImageSize(planet1?.diameter));
+	let planetSize2 = $derived(calculatePlanetImageSize(planet2?.diameter));
+
+	// Inline styles for positioning planet images on the shared line
+	let orbitPlanetStyle1 = $derived(
+		`left: ${orbitPosPercent1}; width: ${planetSize1}; height: ${planetSize1};`
+	);
+	let orbitPlanetStyle2 = $derived(
+		`left: ${orbitPosPercent2}; width: ${planetSize2}; height: ${planetSize2};`
+	);
 </script>
 
-{#snippet valueContent(planet, diameterPx, earthCount, emoji)}
-	{#if label === 'ДИАМЕТР'}
-		<div class="diametr-viz-container">
-			<img
-				src={planet.image}
-				alt={planet.name}
-				class="planet-viz planet-diameter"
-				style="width: {diameterPx}px; height: {diameterPx}px;"
-				title={`Диаметр: ${planet.diameter.toLocaleString('ru-RU')} км`}
-			/>
-		</div>
-	{:else if label === 'МАССА'}
-		<div class="mass-viz-container">
-			{#each Array(earthCount) as _, i (i)}
+<div class="comparison-row">
+	<div class="comparison-row__header">
+		<h3 class="comparison-row__title">
+			{label}{#if key !== 'mass' && unit}, {unit}{/if}
+		</h3>
+		<p class="comparison-row__description">{description}</p>
+	</div>
+
+	{#if key === 'orbit'}
+		<div class="comparison-row__orbit-visualization">
+			<img src="/images/space/stars/sun.png" alt="Sun" class="orbit-sun" />
+			<div class="orbit-line"></div>
+			{#if planet1}
 				<img
-					src="/images/space/planets/earth.png"
-					alt="Earth mass unit"
-					class="earth-mass-unit"
-					title={`Масса ~ ${earthCount} Земель`}
+					src={planet1.image || `/images/space/planets/${planet1.id}.png`}
+					alt={planet1.name}
+					class="orbit-planet-image"
+					style={orbitPlanetStyle1}
+					title={`${planet1.name}: ${planet1.orbit.toLocaleString('ru-RU')} млн км`}
 				/>
-			{/each}
+			{/if}
+			{#if planet2}
+				<img
+					src={planet2.image || `/images/space/planets/${planet2.id}.png`}
+					alt={planet2.name}
+					class="orbit-planet-image"
+					style={orbitPlanetStyle2}
+					title={`${planet2.name}: ${planet2.orbit.toLocaleString('ru-RU')} млн км`}
+				/>
+			{/if}
 		</div>
-	{:else if label === 'ТЕМПЕРАТУРА'}
-		<span class="temp-emoji">{emoji}</span>
 	{/if}
-{/snippet}
 
-<div class="row">
-	<div class="value value1">
-		{@render valueContent(planet1, planet1DiameterPx, earthCount1, emoji1)}
-		<AnimatedNumber value={value1} />
+	<div class="comparison-row__item comparison-row__item--left">
+		<ComparisonItem {key} planet={planet1} value={value1} position="left" />
 	</div>
 
-	<div class="label-container">
-		{#if finalSymbol === '<'}
-			<svg
-				width="32"
-				height="56"
-				viewBox="0 0 32 56"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M32 0H24V8H16V16H8V24H0V32H8V40H16V48H24V56H32V40H24V32H16V24H24V16H32V0Z"
-					fill="#FCB303"
-				/>
-			</svg>
-		{:else}
-			<svg
-				width="32"
-				height="56"
-				viewBox="0 0 32 56"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M0 0H8V8H16V16H24V24H32V32H24V40H16V48H8V56H0V40H8V32H16V24H8V16H0V0Z"
-					fill="#FC6B03"
-				/>
-			</svg>
-		{/if}
+	<div class="comparison-row__symbol-container">
+		<div
+			class="comparison-row__symbol"
+			style="opacity: {$symbolOpacity}; transform: scale({$symbolScale});"
+		>
+			{#if comparisonSymbol === '<'}
+				<svg
+					width="32"
+					height="56"
+					viewBox="0 0 32 56"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					class="comparison-row__symbol-icon comparison-row__symbol-icon--left"
+					><path
+						d="M32 0H24V8H16V16H8V24H0V32H8V40H16V48H24V56H32V40H24V32H16V24H24V16H32V0Z"
+						fill="var(--color-accent-primary)"
+					/></svg
+				>
+			{:else if comparisonSymbol === '>'}
+				<svg
+					width="32"
+					height="56"
+					viewBox="0 0 32 56"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					class="comparison-row__symbol-icon comparison-row__symbol-icon--right"
+					><path
+						d="M0 0H8V8H16V16H24V24H32V32H24V40H16V48H8V56H0V40H8V32H16V24H8V16H0V0Z"
+						fill="var(--color-accent-secondary)"
+					/></svg
+				>
+			{:else}
+				<span>=</span>
+			{/if}
+		</div>
 	</div>
 
-	<div class="value value2">
-		{@render valueContent(planet2, planet2DiameterPx, earthCount2, emoji2)}
-		<AnimatedNumber value={value2} />
+	<div class="comparison-row__item comparison-row__item--right">
+		<ComparisonItem {key} planet={planet2} value={value2} position="right" />
 	</div>
 </div>
 
-<style>
-	.row {
+<style lang="scss">
+	.comparison-row {
 		display: grid;
-		grid-template-columns: 1fr auto 1fr;
-		align-items: center;
-		text-align: center;
-		gap: clamp(0.5rem, 2vw, 1.5rem);
-		min-height: 50px;
-	}
-
-	.label-container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.label {
-		font-size: clamp(0.8rem, 1.8vw, 1.1rem);
-		font-weight: bold;
-		color: var(--accent-color, #4ade80);
-		margin-bottom: 0.2em;
-		white-space: nowrap;
-	}
-
-	.unit {
-		font-size: clamp(0.6rem, 1.2vw, 0.8rem);
-		color: #aaa;
-		margin-bottom: 0.4em;
-	}
-
-	.value {
-		font-size: clamp(1.5rem, 4vw, 2.5rem);
-		font-weight: bold;
+		grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
+		grid-template-areas:
+			'header header header'
+			'item-left symbol item-right'
+			'orbit orbit orbit';
 		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-	.value1 {
-		text-align: right;
-		align-items: flex-end;
-		padding-right: 10px;
-	}
-	.value2 {
-		text-align: left;
-		align-items: flex-start;
-		padding-right: 10px;
+		padding: 15px 0;
+		gap: 30px;
 	}
 
-	.symbol {
-		font-size: clamp(1.2rem, 3vw, 2rem);
-		color: #facc15;
-		font-weight: bold;
-		display: inline-block;
-		min-width: 1em;
+	.comparison-row__header {
+		text-align: center;
+		grid-area: header;
 	}
 
-	.planet-viz {
-		display: block;
-		object-fit: contain;
-		margin: 5px 0;
+	.comparison-row__title {
+		font-size: var(--font-size-title);
+		letter-spacing: var(--font-ls-wide);
+		color: var(--color-accent-prime);
+		white-space: nowrap;
+		text-transform: uppercase;
+		filter: drop-shadow(0 2px 20px rgb(from #7ec2c5 r g b / 80%)) drop-shadow(0 -1px 1px #519433)
+			drop-shadow(0 1px 1px #5c80ca);
 	}
 
-	.planet-diameter {
+	.comparison-row__description {
+		font-size: var(--font-size-description);
+		color: var(--color-text-additional);
+		filter: drop-shadow(0 2px 35px rgb(from #81b0b7 r g b / 60%)) drop-shadow(0 -1px 1px #609433)
+			drop-shadow(0 1px 1px #5c9cca);
 	}
 
-	.mass-viz-container {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		margin-bottom: 5px;
-		max-width: 120px;
-		align-self: center;
-	}
-	.value1 .mass-viz-container {
-		justify-content: flex-end;
-	}
-	.value2 .mass-viz-container {
-		justify-content: flex-start;
+	.comparison-row__item {
+		width: 100%;
 	}
 
-	.earth-mass-unit {
-		width: clamp(12px, 2vw, 18px);
-		height: clamp(12px, 2vw, 18px);
-		margin: 1px;
+	.comparison-row__item--left {
+		grid-area: item-left;
 	}
 
-	.temp-emoji {
-		font-size: clamp(1.2rem, 3vw, 1.8rem);
-		line-height: 1;
+	.comparison-row__item--right {
+		grid-area: item-right;
+	}
+
+	.comparison-row__symbol-container {
+		display: grid;
+		place-content: center;
+		grid-area: symbol;
+	}
+
+	.comparison-row__symbol {
+		height: 56px;
+		width: 32px;
+	}
+	.comparison-row__symbol-icon--left {
+		filter: drop-shadow(-1px 0 10px rgb(from #fcb303 r g b / 50%));
+	}
+	.comparison-row__symbol-icon--right {
+		filter: drop-shadow(-1px 0 10px rgb(from #fc6b03 r g b / 50%));
+	}
+
+	.comparison-row__orbit-visualization {
+		grid-area: orbit;
+		position: relative;
+		height: 40px;
+		width: 100%;
+		margin-top: 20px;
+		margin-bottom: -50px;
+		z-index: 1;
+		left: -12.5vw;
+		top: 0;
+		width: clamp(0px, 75vw, 1920px);
+	}
+
+	.orbit-sun {
+		position: absolute;
+		top: 50%;
+		translate: -82% -50%;
+		width: 4096px;
+		aspect-ratio: 1;
+		max-width: none;
+		z-index: 1;
+		pointer-events: none;
+		user-select: none;
+		animation: rotate 120s infinite linear;
+	}
+
+	@keyframes rotate {
+		0% {
+			rotate: 0;
+		}
+		100% {
+			rotate: 360deg;
+		}
+	}
+
+	.orbit-line {
+		position: absolute;
+		height: 1px;
+		left: 0;
+		top: 0;
+		width: 100%;
+		background: linear-gradient(to right, var(--gradient-orbit-colors));
+		z-index: 0;
+	}
+
+	.orbit-planet-image {
+		position: absolute;
+		translate: 0 -50%;
+		transition: all var(--transition-time-long);
+		z-index: 1;
+		pointer-events: none;
+		user-select: none;
 	}
 </style>

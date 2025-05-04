@@ -128,7 +128,6 @@ input[type='file'] {
 }
 
 :root {
-	/* --- Типографика --- */
 	--font-family-base: 'PxPlus', sans-serif;
 	--font-lh-base: 1.25;
 
@@ -140,36 +139,26 @@ input[type='file'] {
 	--font-ls-normal: 0;
 	--font-ls-wide: 0.05em;
 
-	--color-prime: #ffffff; /* Название 'Prime' */
-	--color-prime-alt: #000000; /* Название 'Prime_alt', хотя там был 15% opacity */
-	--color-background-base: #1b1b1b; /* Темный фон, взят из '#1B1B1B 70%' */
-	--color-text-base: #e0e0e0; /* Основной светлый текст (предположение, подбери точнее) */
-	--color-text-muted: #888888; /* Приглушенный текст (например, unit) (предположение) */
-	--color-border-base: #4a4a4a; /* Базовая граница (как у селекта) */
+	--color-prime: #ffffff;
+	--color-background-base: #010102;
+	--color-text-base: #e0e0e0;
+	--color-text-muted: #888888;
+	--color-text-additional: #81b0b7;
+	--color-border-base: #4a4a4a;
 
-	/* Акцентные */
-	--color-accent-primary: #a07d4a; /* Золотистый/Коричневый (использовался в селекте, похож на Linear 70%) */
-	--color-accent-left: #ff8c00; /* Оранжевый (Accent/Left) (пример, подбери точнее) */
-	--color-accent-primary: #fcb303; /* Оранжевый (Accent/Left) (пример, подбери точнее) */
-	--color-accent-prime: #9fecd2; /* Мятный (Accent/Prime) (пример, подбери точнее) */
-	--color-accent-symbol: #facc15; /* Желтоватый для символа '>' '<' */
-	--color-accent-purple: #9747ff; /* Фиолетовый */
+	--color-accent-secondary: #ff8c00;
+	--color-accent-primary: #fcb303;
+	--color-accent-prime: #9fecd2;
 
-	/* Дополнительные */
-	--color-additional: #81b0b7; /* Голубой/Тиловый (Additional) (пример, подбери точнее) */
+	--color-additional: #81b0b7;
 
 	--gradient-prime-colors: #ffffff 0%, #999999 100%;
 	--gradient-bronze-colors: #d0b78d 0%, #453d34 100%;
-
-	/* Элементы UI */
-	--color-select-bg: #1a1a1a; /* Фон поля селекта */
-	--color-select-arrow-bg: #3a3a3a; /* Фон кнопки стрелки */
-	--color-select-arrow-border: var(--color-border-base); /* Разделитель стрелки */
-	--color-select-option-hover-bg: #3a3a3a; /* Фон опции при наведении */
-	--color-select-option-focus-bg: #4a4a4a; /* Фон опции при фокусе */
-	--color-select-border-hover: var(--color-accent-primary); /* Цвет границы при наведении */
+	--gradient-orbit-colors: #ffefc8 0%, #ab9065 19%, #737373 53%, #ab9065 100%;
+	--gradient-vs-colors: #d0b78d 0%, #96876d 47%, #403017 100%;
 
 	--transition-time: 0.15s;
+	--transition-time-long: 0.5s;
 }
 
 html {
@@ -188,30 +177,6 @@ body {
 
 body {
 	background-color: var(--color-background-base);
-}
-
-// Global styles
-/* --- Опционально: Глобальные утилитарные классы для типографики --- */
-.text-numbers {
-	font-size: var(--font-size-numbers);
-	letter-spacing: var(--font-ls-normal);
-	line-height: var(--font-lh-base); /* Можно и не указывать, если наследуется от body */
-}
-
-.text-title {
-	font-size: var(--font-size-title);
-	letter-spacing: var(--font-ls-wide);
-	line-height: var(--font-lh-base);
-}
-
-.text-select {
-	font-size: var(--font-size-select);
-	letter-spacing: var(--font-ls-wide);
-	line-height: var(--font-lh-base);
-}
-
-.text-description {
-	font-size: var(--font-size-description);
-	letter-spacing: var(--font-ls-normal);
-	line-height: var(--font-lh-base);
+	// display: grid;
+	// place-content: center;
 }

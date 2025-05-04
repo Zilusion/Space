@@ -309,7 +309,7 @@
 
 	.custom-select__option {
 		cursor: pointer;
-		color: var(--color-additional);
+		color: var(--color-text-additional);
 		display: flex;
 		gap: 10px;
 		transition: all var(--transition-time) ease-in-out;

@@ -33,24 +33,25 @@
 </script>
 
 <div class="comparison-grid">
-	{#each comparisonData as row}
+	{#each comparisonData as row (row.key)}
 		<ComparisonRow
-			label={row.label}
-			unit={row.unit}
-			value1={planet1[row.key]}
-			value2={planet2[row.key]}
-			isTemperature={row.key === 'temperature'}
-			{planet1}
-			{planet2}
-		/>
+            label={row.label}
+            key={row.key}
+            unit={row.unit}
+            description={row.description}
+            value1={planet1?.[row.key]}
+            value2={planet2?.[row.key]}
+            {planet1}
+            {planet2}
+        />
 	{/each}
 </div>
 
-<style>
+<style lang="scss">
 	.comparison-grid {
-		display: grid;
-		gap: clamp(1rem, 3vh, 2rem);
-		max-width: 900px;
-		margin: 0 auto;
-	}
+        display: grid;
+        row-gap: 150px;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
 </style>

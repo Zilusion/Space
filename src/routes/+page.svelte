@@ -26,9 +26,8 @@
 </script>
 
 <div class="container">
-	<header>
-		<!-- <h1>КОСМОС</h1> -->
-		<img src="/images/logo.png" alt="">
+	<header class="page-header">
+		<img src="/images/logo.png" alt="КОСМОС Лого" class="logo-image" />
 	</header>
 
 	<main>
@@ -54,27 +53,28 @@
 			<p>Выберите две планеты для сравнения.</p>
 		{/if}
 	</main>
-
-	<div class="background-planet"></div>
 </div>
 
-<style>
+<style lang="scss">
 	.container {
+		min-height: 100vh;
+		max-width: 840px;
+		padding: clamp(1rem, 3vw, 2rem);
 		display: grid;
 		grid-template-rows: auto auto 1fr;
-		min-height: 100vh;
-		padding: clamp(1rem, 5vw, 3rem);
-		position: relative;
-		overflow: hidden;
-		gap: clamp(1rem, 4vh, 3rem);
+		gap: clamp(1.5rem, 5vh, 3rem);
+		margin-inline: auto;
 	}
 
-	header {
+	.page-header {
 		text-align: center;
+		padding-block: 40px;
+		background: url('/images/header-bg.png') center center/contain no-repeat;
 	}
 
-	header h1 {
-		font-size: clamp(2.5rem, 10vw, 6rem);
+	.logo-image {
+		
+		width: 100%;
 	}
 
 	.selectors {
@@ -82,26 +82,14 @@
 		justify-content: center;
 		align-items: center;
 		gap: clamp(1rem, 5vw, 4rem);
-		flex-wrap: wrap;
+		margin-bottom: 100px;
 	}
 
 	.vs {
-		font-weight: bold;
-		font-size: clamp(1.2rem, 3vw, 2rem);
-		color: var(--accent-color, #aaa);
+		font-size: 4rem;
+		background: linear-gradient(to right, var(--gradient-vs-colors));
+		color: transparent;
+		background-clip: text;
+		opacity: 0.8;
 	}
-
-	.background-planet {
-		position: absolute;
-		left: -38%;
-		top: 35vh;
-		width: clamp(400px, 80vw, 1200px);
-		height: clamp(400px, 80vw, 1200px);
-		background-image: url('/images/space/stars/sun.png');
-		background-size: contain;
-		border-radius: 50%;
-		z-index: -1;
-		transition: background-image 0.5s ease-in-out;
-	}
-
 </style>
