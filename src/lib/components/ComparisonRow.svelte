@@ -21,8 +21,12 @@
 	const symbolScale = tweened(0.5, { duration: 300, easing: cubicOut });
 
 	$effect(() => {
-		symbolOpacity.set(0).then(() => symbolOpacity.set(1));
-		symbolScale.set(0.5).then(() => symbolScale.set(1));
+		symbolOpacity.set(0).then(() => symbolOpacity.set(1, { duration: 150 }));
+
+		symbolScale
+			.set(0.6, { duration: 100 })
+			.then(() => symbolScale.set(1.1, { duration: 150 }))
+			.then(() => symbolScale.set(1, { duration: 200, easing: cubicOut }));
 		const _trigger = comparisonSymbol;
 	});
 
@@ -67,10 +71,16 @@
 
 <div class="comparison-row comparison-row--{key}">
 	<div class="comparison-row__header">
-		<h3 class="comparison-row__title">
-			{label}{#if key !== 'mass' && unit}, {unit}{/if}
-		</h3>
-		<p class="comparison-row__description">{description}</p>
+		{#key label}
+			<h3 class="comparison-row__title" in:fly={{ y: -10, duration: 300, delay: 200 }}>
+				{label}{#if key !== 'mass' && unit}, {unit}{/if}
+			</h3>
+		{/key}
+		{#key description}
+			<p class="comparison-row__description" in:fade={{ duration: 300, delay: 250 }}>
+				{description}
+			</p>
+		{/key}
 	</div>
 
 	{#if key === 'orbit'}
@@ -79,7 +89,9 @@
 			<div class="orbit-line"></div>
 			{#if planet1}
 				<img
-					src="{planet1.image ? `${base}${planet1.image}` : `${base}/images/universe/planets/${planet1.id}.webp`}"
+					src={planet1.image
+						? `${base}${planet1.image}`
+						: `${base}/images/universe/planets/${planet1.id}.webp`}
 					alt={planet1.name}
 					class="orbit-planet-image"
 					style={orbitPlanetStyle1}
@@ -88,7 +100,9 @@
 			{/if}
 			{#if planet2}
 				<img
-					src="{planet2.image ? `${base}${planet2.image}` : `${base}/images/universe/planets/${planet2.id}.webp`}"
+					src={planet2.image
+						? `${base}${planet2.image}`
+						: `${base}/images/universe/planets/${planet2.id}.webp`}
 					alt={planet2.name}
 					class="orbit-planet-image"
 					style={orbitPlanetStyle2}
@@ -176,6 +190,14 @@
 		text-transform: uppercase;
 		filter: drop-shadow(0 2px 20px rgb(from #7ec2c5 r g b / 80%)) drop-shadow(0 -1px 1px #519433)
 			drop-shadow(0 1px 1px #5c80ca);
+		transition: all var(--transition-time) ease-in-out;
+
+		&:hover {
+			color: var(--color-accent-secondary);
+			filter: drop-shadow(0 2px 20px rgb(from var(--color-accent-secondary) r g b / 0.7))
+				drop-shadow(0 -1px 1px rgb(from var(--color-accent-secondary) r g b / 0.3))
+				drop-shadow(0 1px 1px rgb(from var(--color-prime) r g b / 0.7));
+		}
 	}
 
 	.comparison-row__description {
@@ -183,6 +205,14 @@
 		color: var(--color-text-additional);
 		filter: drop-shadow(0 2px 35px rgb(from #81b0b7 r g b / 60%)) drop-shadow(0 -1px 1px #609433)
 			drop-shadow(0 1px 1px #5c9cca);
+		transition: all var(--transition-time) ease-in-out;
+
+		&:hover {
+			color: var(--color-accent-primary);
+			filter: drop-shadow(0 2px 20px rgb(from var(--color-accent-secondary) r g b / 0.7))
+				drop-shadow(0 -1px 1px rgb(from var(--color-accent-secondary) r g b / 0.3))
+				drop-shadow(0 1px 1px rgb(from var(--color-prime) r g b / 0.7));
+		}
 	}
 
 	.comparison-row__item {
@@ -231,33 +261,35 @@
 		width: clamp(200px, 300vw, 4096px);
 		aspect-ratio: 1;
 		max-width: none;
-		z-index: 1;
+		z-index: 10;
 		pointer-events: none;
 		user-select: none;
-		will-change: rotate;
-		
+		will-change: transform, opacity;
+		animation: pulse 8s infinite ease-in-out alternate;
+
 		&:hover {
 			animation: rotate 240s infinite linear;
 		}
 	}
 
-	@keyframes rotate {
-		0% {
-			rotate: 0;
-		}
+	@keyframes pulse {
+		0%,
 		100% {
-			rotate: 360deg;
+			filter: brightness(0.9);
+		}
+		50% {
+			filter: brightness(1.1);
 		}
 	}
 
 	.orbit-line {
 		position: absolute;
 		height: 1px;
-		left: -100vw;
+		left: -50vw;
 		top: 0;
 		right: 0;
 		background: linear-gradient(to right, var(--gradient-orbit-colors));
-		z-index: 0;
+		z-index: 1;
 	}
 
 	.orbit-planet-image {
@@ -265,7 +297,15 @@
 		translate: 0 -50%;
 		transition: all var(--transition-time-long);
 		z-index: 1;
-		pointer-events: none;
+		pointer-events: all;
 		user-select: none;
+
+		&:hover {
+			translate: -50% 35%;
+			scale: 1.2;
+			rotate: 3deg;
+			filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.7))
+				drop-shadow(0 0 10px rgba(var(--color-accent-primary-rgb), 0.5));
+		}
 	}
 </style>

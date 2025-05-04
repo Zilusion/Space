@@ -36,58 +36,60 @@
 </script>
 
 <div class="comparison-item comparison-item--{position} comparison-item--{key}">
-	{#if key === 'diameter'}
-		<div class="comparison-item__visual comparison-item__visual--diameter">
-			{#if planet}
-				<img
-					src={planet.image
-						? `${base}${planet.image}`
-						: `${base}/images/universe/planets/${planet.id}.webp`}
-					alt={planet.name}
-					class="planet-image"
-					style="width: {diameterPx}px; height: {diameterPx}px;"
-					title={`Диаметр: ${planet.diameter.toLocaleString('ru-RU')} км`}
-				/>
-			{/if}
-		</div>
-	{:else if key === 'mass'}
-		<div
-			class="comparison-item__visual comparison-item__visual--mass"
-			style:--mass-grid-columns={massGridColumns}
-			style:--earth-icon-scale={earthIconScale}
-			style:--mass-grid-gap={massGridGap}
-			title={`Масса ~ ${earthCount} Земель`}
-		>
-			{#if earthCount > 0}
-				{#each Array(earthCount) as _, i (i)}
+	{#key planet?.id || 'none' + key}
+		{#if key === 'diameter'}
+			<div class="comparison-item__visual comparison-item__visual--diameter">
+				{#if planet}
 					<img
-						src="{base}/images/universe/planets/earth.webp"
-						alt=""
-						aria-hidden="true"
-						class="earth-icon"
-						title={`Масса ~ ${earthCount} Земель`}
-						loading="lazy"
+						src={planet.image
+							? `${base}${planet.image}`
+							: `${base}/images/universe/planets/${planet.id}.webp`}
+						alt={planet.name}
+						class="planet-image"
+						style="width: {diameterPx}px; height: {diameterPx}px;"
+						title={`Диаметр: ${planet.diameter.toLocaleString('ru-RU')} км`}
+					/>
+				{/if}
+			</div>
+		{:else if key === 'mass'}
+			<div
+				class="comparison-item__visual comparison-item__visual--mass"
+				style:--mass-grid-columns={massGridColumns}
+				style:--earth-icon-scale={earthIconScale}
+				style:--mass-grid-gap={massGridGap}
+				title={`Масса ~ ${earthCount} Земель`}
+			>
+				{#if earthCount > 0}
+					{#each Array(earthCount) as _, i (i)}
+						<img
+							src="{base}/images/universe/planets/earth.webp"
+							alt=""
+							aria-hidden="true"
+							class="earth-icon"
+							title={`Масса ~ ${earthCount} Земель`}
+							loading="lazy"
+						/>
+					{/each}
+				{/if}
+			</div>
+		{:else if key === 'temperature'}
+			<div class="comparison-item__visual comparison-item__visual--temperature">
+				{#each temperatureImageNames as imageName (imageName)}
+					<img
+						src="{base}/images/emoji/{imageName}.webp"
+						alt={imageName}
+						class="temperature-emoji-image"
 					/>
 				{/each}
-			{/if}
-		</div>
-	{:else if key === 'temperature'}
-		<div class="comparison-item__visual comparison-item__visual--temperature">
-			{#each temperatureImageNames as imageName (imageName)}
-				<img
-					src="{base}/images/emoji/{imageName}.webp"
-					alt={imageName}
-					class="temperature-emoji-image"
-				/>
-			{/each}
-		</div>
-	{:else if key === 'orbit'}
-		<div class="comparison-item__visual comparison-item__visual--orbit"></div>
-	{:else if key === 'gravity'}
-		<div class="comparison-item__visual comparison-item__visual--gravity">
-			<GravityJump gravityValue={value} />
-		</div>
-	{/if}
+			</div>
+		{:else if key === 'orbit'}
+			<div class="comparison-item__visual comparison-item__visual--orbit"></div>
+		{:else if key === 'gravity'}
+			<div class="comparison-item__visual comparison-item__visual--gravity">
+				<GravityJump gravityValue={value} />
+			</div>
+		{/if}
+	{/key}
 
 	<div class="comparison-item__value">
 		<AnimatedNumber
@@ -136,6 +138,21 @@
 		transition: all var(--transition-time) ease-in-out;
 	}
 
+	.planet-image {
+		transform-origin: center center;
+		animation: gentle-wobble 5s infinite ease-in-out alternate;
+		will-change: transform;
+	}
+
+	@keyframes gentle-wobble {
+		0% {
+			transform: scale(1) rotate(-1deg);
+		}
+		100% {
+			transform: scale(1.02) rotate(1deg);
+		}
+	}
+
 	.comparison-item__visual--mass {
 		--mass-grid-columns: 7;
 		--earth-icon-scale: 1;
@@ -166,7 +183,7 @@
 	.comparison-item__visual--gravity {
 		display: flex;
 		justify-content: center;
-		align-items: flex-end; 
+		align-items: flex-end;
 		height: 100%;
 		min-height: 150px;
 		padding-bottom: 10px;
@@ -197,5 +214,11 @@
 		filter: drop-shadow(0 2px 35px rgb(from #ffffff r g b / 40%)) drop-shadow(0 -1px 1px #947533)
 			drop-shadow(0 1px 1px #cab05c);
 		align-self: flex-end;
+		transition: all var(--transition-time) ease-in-out;
+
+		&:hover {
+			filter: drop-shadow(0 3px 35px rgb(from var(--color-prime) r g b / 0.55))
+				drop-shadow(0 -1px 1px var(--color-accent-primary)) drop-shadow(0 1px 1px #ddc06f);
+		}
 	}
 </style>
